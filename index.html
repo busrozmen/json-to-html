@@ -22,6 +22,13 @@
 <body>
     <div class="container">
         <div class="input-group mb-3">
+            <div class="btn-group">
+                <select id="select-drop" class='select_drop'>
+                    <option class="dropdown-item" value="s">By Search</option>
+                    <option class="dropdown-item" value="t">By Title</option>
+                </select>
+            </div>
+
             <input type="text" class="form-control" style="background:#181A1B" id="movie-name-input"
                 placeholder="movie name" aria-label="Default" aria-describedby="inputGroup-sizing-default">
             <button id="movie-search" class="btn btn-success">Search</button>
@@ -29,13 +36,16 @@
         <div id="search-results"></div>
     </div>
     <script>
-        function movieTemplate(movie) {
+        function movieTemplate(movie) {   
             return `
             <div class="col-md-4 col-sm-12" style="padding-right: 0px; padding-left: 0px;">
             <div class="movie">
             <img class="movie-poster" src="${movie.Poster}">
             <h2 class="movie-title">${movie.Title}</h2>
             <h4 class="movie-type">${movie.Type}</h4>
+            <h4 class="movie-runtime">${movie.Runtime !==undefined ? movie.Runtime :""}</h4>
+            <h4 class="movie-genre">${movie.Genre !==undefined ? movie.Genre :""}</h4>
+            <h4 class="movie-ratings">${movie.imdbRating !==undefined ? movie.imdbRating :""}</h4>
             <p style="color: #D6D3CD;"><strong>Year:</strong> ${movie.Year}</p>
             </div>
             </div>
@@ -43,32 +53,55 @@
         }
 
         function getHtml(jsonData) {
-            document.getElementById("search-results").innerHTML = `
-            <h1 class="total-count">${jsonData.length} results </h1></br><div class="row">
-            ${jsonData.map(movieTemplate).join("")}
-            </div><p class="footer">These ${jsonData.length} movies</p>
+            if (jsonData) {
+                document.getElementById("search-results").innerHTML = `
+            <h1 class="total-count">${jsonData.length>1 ? jsonData.length :1 } results </h1></br><div class="row">
+            ${jsonData.length>1 ? jsonData.map(movieTemplate).join("") : movieTemplate(jsonData)}
+            </div><p class="footer">${jsonData.length>1 ? jsonData.length :1} results</p>
             `;
+            }  else {
+                document.getElementById("search-results").innerHTML = `
+            <h1 class="total-count">Not Found</h1>
+            `;
+            }
 
         }
-        async function getMovieData(mname) {
-            const api_url = "http://www.omdbapi.com/?apikey=779f9ccb&s=" + mname;
+        async function getMovieData(mname, mtype) {
+            const api_url = "http://www.omdbapi.com/?apikey=779f9ccb&" + mtype + "=" + mname;
             let html = '';
             fetch(api_url)
                 .then((response) => {
                     return response.json();
                 })
                 .then((data) => {
-                    getHtml(data.Search);
+                    if (mtype === "s") {
+                        getHtml(data.Search);
+                    } else {
+                        getHtml(data);
+                    }
                 });
 
         }
 
         jQuery('body').on('click', '#movie-search', function () {
             var movieName = document.getElementById("movie-name-input").value;
-            getMovieData(movieName);
+            var searchType = document.getElementById("select-drop");
+            var selectedType = searchType.options[searchType.selectedIndex].value;
+
+            getMovieData(movieName, selectedType);
         })
     </script>
     <style>
+        #select-drop {
+            background-color: #a8a8a8;
+            color: #fff;
+            border-radius: 4px;
+        }
+
+        #select-drop option {
+            color: #fff;
+        }
+
         body {
             font-family: sans-serif;
             background-color: #000;
@@ -118,7 +151,21 @@
             color: #BAB5AB;
             vertical-align: middle;
         }
-
+        .movie-runtime {
+            font-size: 1rem;
+            color: #BAB5AB;
+            vertical-align: middle;
+        }
+        .movie-genre {
+            font-size: 1rem;
+            color: #BAB5AB;
+            vertical-align: middle;
+        }
+        .movie-ratings {
+            font-size: 1rem;
+            color: #BAB5AB;
+            vertical-align: middle;
+        }
 
         .footer {
             font-size: 0.7rem;
