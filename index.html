@@ -4,19 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
-        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous">
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
-        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous">
     </script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
-        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous">
     </script>
     </script>
     <title>json to html example</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -28,153 +25,11 @@
                     <option class="dropdown-item" value="t">By Title</option>
                 </select>
             </div>
-
-            <input type="text" class="form-control" style="background:#181A1B" id="movie-name-input"
-                placeholder="movie name" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+            <input type="text" class="form-control" id="movie-name-input" placeholder="movie name" aria-label="Default" aria-describedby="inputGroup-sizing-default">
             <button id="movie-search" class="btn btn-success">Search</button>
         </div>
         <div id="search-results"></div>
     </div>
-    <script>
-        function movieTemplate(movie) {   
-            return `
-            <div class="col-md-4 col-sm-12" style="padding-right: 0px; padding-left: 0px;">
-            <div class="movie">
-            <img class="movie-poster" src="${movie.Poster}">
-            <h2 class="movie-title">${movie.Title}</h2>
-            <h4 class="movie-type">${movie.Type}</h4>
-            <h4 class="movie-runtime">${movie.Runtime !==undefined ? movie.Runtime :""}</h4>
-            <h4 class="movie-genre">${movie.Genre !==undefined ? movie.Genre :""}</h4>
-            <h4 class="movie-ratings">${movie.imdbRating !==undefined ? movie.imdbRating :""}</h4>
-            <p style="color: #D6D3CD;"><strong>Year:</strong> ${movie.Year}</p>
-            </div>
-            </div>
-            `;
-        }
-
-        function getHtml(jsonData) {
-            if (jsonData) {
-                document.getElementById("search-results").innerHTML = `
-            <h1 class="total-count">${jsonData.length>1 ? jsonData.length :1 } results </h1></br><div class="row">
-            ${jsonData.length>1 ? jsonData.map(movieTemplate).join("") : movieTemplate(jsonData)}
-            </div><p class="footer">${jsonData.length>1 ? jsonData.length :1} results</p>
-            `;
-            }  else {
-                document.getElementById("search-results").innerHTML = `
-            <h1 class="total-count">Not Found</h1>
-            `;
-            }
-
-        }
-        async function getMovieData(mname, mtype) {
-            const api_url = "http://www.omdbapi.com/?apikey=779f9ccb&" + mtype + "=" + mname;
-            let html = '';
-            fetch(api_url)
-                .then((response) => {
-                    return response.json();
-                })
-                .then((data) => {
-                    if (mtype === "s") {
-                        getHtml(data.Search);
-                    } else {
-                        getHtml(data);
-                    }
-                });
-
-        }
-
-        jQuery('body').on('click', '#movie-search', function () {
-            var movieName = document.getElementById("movie-name-input").value;
-            var searchType = document.getElementById("select-drop");
-            var selectedType = searchType.options[searchType.selectedIndex].value;
-
-            getMovieData(movieName, selectedType);
-        })
-    </script>
-    <style>
-        #select-drop {
-            background-color: #3d4143;
-            color: #fff;
-            border-radius: 4px;
-            border-color: #3d4143;
-        }
-
-        #select-drop option {
-            color: #fff;
-        }
-
-        body {
-            font-family: sans-serif;
-            background-color: #000;
-            color: #333;
-            padding: 20px 0 28px 0;
-            margin: 0;
-        }
-
-        img {
-            max-width: 100%;
-            height: auto;
-        }
-
-        .total-count {
-            text-align: center;
-            font-weight: normal;
-            font-size: 1.5rem;
-            color: #D6D3CD;
-        }
-
-        .movie {
-            padding: 10px;
-            margin: 10px;
-            background-color: #000;
-            box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            border-radius: 4px;
-        }
-
-
-        .movie-poster {
-            width: 100%;
-            margin-right: 15px;
-        }
-
-        .movie-title {
-            font-size: 1.2rem;
-            font-weight: normal;
-            margin: 1rem 0 1rem 0;
-            height: 50px;
-            color: #D6D3CD;
-        }
-
-        .movie-type {
-            font-size: 1rem;
-            font-style: italic;
-            color: #BAB5AB;
-            vertical-align: middle;
-        }
-        .movie-runtime {
-            font-size: 1rem;
-            color: #BAB5AB;
-            vertical-align: middle;
-        }
-        .movie-genre {
-            font-size: 1rem;
-            color: #BAB5AB;
-            vertical-align: middle;
-        }
-        .movie-ratings {
-            font-size: 1rem;
-            color: #BAB5AB;
-            vertical-align: middle;
-        }
-
-        .footer {
-            font-size: 0.7rem;
-            color: #888;
-            text-align: center;
-            margin: 0;
-        }
-    </style>
+    <script src="main.js"></script>
 </body>
-
 </html>
